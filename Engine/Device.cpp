@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "Device.h"
 
+#include <CompiledShaders/Raytracing.hlsl.h>
+
 winrt::com_ptr<IDXGIFactory6> Vortex::Device::s_dxgiFactory;
 std::vector<Vortex::Device> Vortex::Device::s_deviceList;
 
@@ -244,6 +246,28 @@ winrt::com_ptr<ID3D12PipelineState> Vortex::Device::CreateComputePSO(const winrt
     winrt::check_hresult(m_d3d12Device->CreateComputePipelineState(&computeDesc, IID_PPV_ARGS(&pipelineState)));
     return pipelineState;
 }
+
+//winrt::com_ptr<ID3D12PipelineState> Vortex::Device::CreateRayTracingPSO(const winrt::com_ptr<ID3D12RootSignature>& rootSignature, const D3D12_SHADER_BYTECODE& raygen) const
+//{
+//    CD3DX12_STATE_OBJECT_DESC dxrStateObjectDesc{ D3D12_STATE_OBJECT_TYPE_RAYTRACING_PIPELINE };
+//	// Add compiled shaders
+//    auto lib = dxrStateObjectDesc.CreateSubobject<CD3DX12_DXIL_LIBRARY_SUBOBJECT>();
+//    D3D12_SHADER_BYTECODE libdxil = CD3DX12_SHADER_BYTECODE((void*)g_pRaytracing, ARRAYSIZE(g_pRaytracing));
+//    lib->SetDXILLibrary(&libdxil);
+//    lib->DefineExport(L"MyRaygenShader");
+//    lib->DefineExport(L"MyMissShader");
+//
+//    // Create DXR PSO
+//	winrt::com_ptr<ID3D12StateObject> dxrStateObject;
+//	winrt::check_hresult(m_d3d12Device->CreateStateObject(dxrStateObjectDesc, IID_PPV_ARGS(&dxrStateObject)));
+//
+//    // Build Acceleration Struct
+//
+//	winrt::com_ptr<ID3D12StateObjectProperties> rtpso;
+//	rtpso = dxrStateObject.as<ID3D12StateObjectProperties>();
+//	rtpso->GetShaderIdentifier(L"raygen_main");
+//	rtpso->GetShaderIdentifier(L"miss_main");
+//}
 
 winrt::com_ptr<ID3D12DescriptorHeap> Vortex::Device::CreateResourceHeap(uint32_t num) const
 {

@@ -153,7 +153,7 @@ void Vortex::Shader::Compile()
 	}
 
 	winrt::com_ptr<IDxcBlob> dxcBinary;
-	winrt::com_ptr<IDxcBlobUtf16> dxcBinaryName;
+	winrt::com_ptr<IDxcBlobWide> dxcBinaryName;
 	winrt::check_hresult(dxcResult->GetOutput(DXC_OUT_OBJECT, IID_PPV_ARGS(dxcBinary.put()), dxcBinaryName.put()));
 	if (dxcBinary.get() != nullptr)
 	{

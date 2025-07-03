@@ -30,7 +30,7 @@ namespace Vortex
 	private:
 		// Variables
 		DXGI_ADAPTER_DESC2 m_adapterDesc;
-		winrt::com_ptr<ID3D12Device4> m_d3d12Device;
+		winrt::com_ptr<ID3D12Device5> m_d3d12Device;
 	public:
 		// Wrapped functions
 		winrt::com_ptr<ID3D12Fence1> CreateFence(uint64_t value) const;
@@ -63,6 +63,10 @@ namespace Vortex
         winrt::com_ptr<ID3D12PipelineState> CreateComputePSO(
             const winrt::com_ptr<ID3D12RootSignature>& rootSignature,
             const D3D12_SHADER_BYTECODE& compute) const;
+
+		winrt::com_ptr<ID3D12PipelineState> CreateRayTracingPSO(
+			const winrt::com_ptr<ID3D12RootSignature>& rootSignature,
+			const D3D12_SHADER_BYTECODE& raygen) const;
 
 
 		winrt::com_ptr<ID3D12DescriptorHeap> CreateResourceHeap(uint32_t num) const;
