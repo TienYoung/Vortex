@@ -5,7 +5,9 @@ Vortex::Renderer::Renderer(HWND hWnd, uint32_t width, uint32_t height) :
     m_fenceEvent(::CreateEvent(nullptr, FALSE, FALSE, nullptr)), m_fenceValue(0),
     m_timeSinceStart(std::chrono::steady_clock::now()),
     m_camera(std::make_shared<Camera>()),
-    m_globalParams(std::make_shared<GlobalParameters>())
+    m_globalParams(std::make_shared<GlobalParameters>()),
+	m_viewport(0.0f, 0.0f, static_cast<float>(width), static_cast<float>(height)),
+	m_scissorRect(0, 0, static_cast<LONG>(width), static_cast<LONG>(height))
 {
     winrt::check_bool(bool{ m_fenceEvent });
 
@@ -19,7 +21,7 @@ Vortex::Renderer::Renderer(HWND hWnd, uint32_t width, uint32_t height) :
     m_commandListBegin = VX_DEVICE0->CreateGraphicsCommandList();
     m_commandListEnd = VX_DEVICE0->CreateGraphicsCommandList();
 
-    m_swapChain = std::make_shared<SwapChain>(m_commandQueue, hWnd, width, height);
+    m_renderTarget = std::make_shared<RenderTarget>(hWnd, m_commandQueue);
 
     winrt::check_hresult(GameInputCreate(m_gameInput.put()));
     //winrt::check_hresult(RegisterReadingCallback(m_gameMouse, GameInputKindMouse, 0, ));
@@ -41,9 +43,9 @@ void Vortex::Renderer::Execute()
     // Begin frame.
     {
         winrt::check_hresult(m_commandListBegin->Reset(m_commandAllocator.get(), nullptr));
-        m_commandListBegin->ResourceBarrier(1, m_swapChain->GetRenderTarget()->PrepareForRender());
+        m_commandListBegin->ResourceBarrier(1, m_renderTarget->PrepareForRender());
         static const float clearColor[] = { 0.0f, 0.0f, 0.0f, 0.0f };
-        m_commandListBegin->ClearRenderTargetView(m_swapChain->GetRenderTarget()->GetCPUDescriptorHandle(), clearColor, 0, nullptr);
+        m_commandListBegin->ClearRenderTargetView(m_renderTarget->GetCPUDescriptorHandle(), clearColor, 0, nullptr);
         winrt::check_hresult(m_commandListBegin->Close());
     }
     commandLists.push_back(m_commandListBegin.get());
@@ -51,13 +53,13 @@ void Vortex::Renderer::Execute()
     // Passes frames.
     for (const std::unique_ptr<IRenderPass>& pass : m_passes)
     {
-        commandLists.push_back(pass->GetCommandList(m_swapChain, *this));
+        commandLists.push_back(pass->GetCommandList(*this));
     }
 
     // End frame.
     {
         winrt::check_hresult(m_commandListEnd->Reset(m_commandAllocator.get(), nullptr));
-        m_commandListEnd->ResourceBarrier(1, m_swapChain->GetRenderTarget()->PrepareForPresent());
+        m_commandListEnd->ResourceBarrier(1, m_renderTarget->PrepareForPresent());
         winrt::check_hresult(m_commandListEnd->Close());
     }
     commandLists.push_back(m_commandListEnd.get());
@@ -65,7 +67,7 @@ void Vortex::Renderer::Execute()
     // Execute
     m_commandQueue->ExecuteCommandLists(static_cast<uint32_t>(commandLists.size()), commandLists.data());
 
-    m_swapChain->Flip();
+    m_renderTarget->Flip();
 }
 
 Vortex::Renderer::~Renderer()

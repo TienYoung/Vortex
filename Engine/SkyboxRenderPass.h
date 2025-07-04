@@ -31,15 +31,15 @@ namespace Vortex
             m_commandList = VX_DEVICE0->CreateGraphicsCommandList();
         }
 
-        inline ID3D12GraphicsCommandList* GetCommandList(std::shared_ptr<SwapChain> swapChain, const Renderer& renderer) const override
+        inline ID3D12GraphicsCommandList* GetCommandList(const Renderer& renderer) const override
         {
             winrt::check_hresult(m_commandAllocator->Reset());
             winrt::check_hresult(m_commandList->Reset(m_commandAllocator.get(), nullptr));
 
-            m_commandList->RSSetViewports(1, swapChain->GetViewport());
-            m_commandList->RSSetScissorRects(1, swapChain->GetScissorRect());
+            m_commandList->RSSetViewports(1, renderer.GetViewport());
+            m_commandList->RSSetScissorRects(1, renderer.GetScissorRect());
 
-            D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = swapChain->GetRenderTarget()->GetCPUDescriptorHandle();
+            D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = renderer.GetRenderTarget()->GetCPUDescriptorHandle();
             m_commandList->OMSetRenderTargets(1, &rtvHandle, FALSE, nullptr);
 
             std::vector<ID3D12DescriptorHeap*> heaps = VX_DEVICE0->GetHeaps();

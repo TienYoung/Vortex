@@ -3,8 +3,8 @@
 #include "Device.h"
 #include "RenderTarget.h"
 
-Vortex::RenderTarget::RenderTarget(winrt::com_ptr<IDXGISwapChain3> swapChain) :
-	m_swapChain(swapChain)
+Vortex::RenderTarget::RenderTarget(HWND window, const winrt::com_ptr<ID3D12CommandQueue>& commandQueue) :
+	m_swapChain(VX_DEVICE0->CreateSwapChain(window, commandQueue))
 {
 	m_buffers.resize(VX_DOUBLE_BUFFER);
 	m_cpuDescriptorHandles.resize(VX_DOUBLE_BUFFER);

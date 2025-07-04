@@ -56,7 +56,7 @@ namespace Vortex
             }
         }
 
-        inline ID3D12GraphicsCommandList* GetCommandList(std::shared_ptr<SwapChain> swapChain, const Renderer& renderer) const override 
+        inline ID3D12GraphicsCommandList* GetCommandList(const Renderer& renderer) const override 
         {
             uint8_t* gpuPtr = nullptr;
             CD3DX12_RANGE range(0, 0);
@@ -69,11 +69,11 @@ namespace Vortex
             winrt::check_hresult(m_commandAllocator->Reset());
             winrt::check_hresult(m_commandList->Reset(m_commandAllocator.get(), nullptr));
 
-            m_commandList->RSSetViewports(1, swapChain->GetViewport());
-            m_commandList->RSSetScissorRects(1, swapChain->GetScissorRect());
+			m_commandList->RSSetViewports(1, renderer.GetViewport());
+			m_commandList->RSSetScissorRects(1, renderer.GetScissorRect());
 
-            D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = swapChain->GetRenderTarget()->GetCPUDescriptorHandle();
-            m_commandList->OMSetRenderTargets(1, &rtvHandle, FALSE, nullptr);
+			D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = renderer.GetRenderTarget()->GetCPUDescriptorHandle();
+			m_commandList->OMSetRenderTargets(1, &rtvHandle, FALSE, nullptr);
 
             std::vector<ID3D12DescriptorHeap*> heaps = VX_DEVICE0->GetHeaps();
             m_commandList->SetDescriptorHeaps(static_cast<uint32_t>(heaps.size()), heaps.data());

@@ -5,13 +5,7 @@ namespace Vortex
 	class RenderTarget
 	{
 	public:
-		RenderTarget() = default;
-		RenderTarget(winrt::com_ptr<IDXGISwapChain3> swapChain);
-
-		ID3D12Resource* GetResource() const
-		{
-			return m_buffers[m_swapChain->GetCurrentBackBufferIndex()].get();
-		}
+		RenderTarget(HWND window, const winrt::com_ptr<ID3D12CommandQueue>& commandQueue);
 
 		const CD3DX12_RESOURCE_BARRIER* PrepareForPresent() const
 		{
@@ -26,6 +20,11 @@ namespace Vortex
 		D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle() const
 		{
 			return m_cpuDescriptorHandles[m_swapChain->GetCurrentBackBufferIndex()];
+		}
+
+		void Flip() const
+		{
+			winrt::check_hresult(m_swapChain->Present(0, DXGI_PRESENT_ALLOW_TEARING));
 		}
 
 	private:
