@@ -6,21 +6,35 @@ namespace Vortex
 	{
 	public:
 		RenderTarget() = default;
-		RenderTarget(winrt::com_ptr<ID3D12Resource> buffer);
+		RenderTarget(winrt::com_ptr<IDXGISwapChain3> swapChain);
 
 		ID3D12Resource* GetResource() const
 		{
-			return m_bufferResource.get();
+			return m_buffers[m_swapChain->GetCurrentBackBufferIndex()].get();
+		}
+
+		const CD3DX12_RESOURCE_BARRIER* PrepareForPresent() const
+		{
+			return &m_presentBarriers[m_swapChain->GetCurrentBackBufferIndex()];
+		}
+
+		const CD3DX12_RESOURCE_BARRIER* PrepareForRender() const
+		{
+			return &m_renderBarriers[m_swapChain->GetCurrentBackBufferIndex()];
 		}
 
 		D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle() const
 		{
-			return m_cpuDescriptorHandle;
+			return m_cpuDescriptorHandles[m_swapChain->GetCurrentBackBufferIndex()];
 		}
 
 	private:
-		winrt::com_ptr<ID3D12Resource> m_bufferResource;
-		D3D12_CPU_DESCRIPTOR_HANDLE m_cpuDescriptorHandle;
+		winrt::com_ptr<IDXGISwapChain3> m_swapChain;
+
+		std::vector<winrt::com_ptr<ID3D12Resource>> m_buffers;
+		std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> m_cpuDescriptorHandles;
+		std::vector<CD3DX12_RESOURCE_BARRIER> m_presentBarriers;
+		std::vector<CD3DX12_RESOURCE_BARRIER> m_renderBarriers;
 	};
 }
 

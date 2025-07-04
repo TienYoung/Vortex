@@ -41,7 +41,7 @@ void Vortex::Renderer::Execute()
     // Begin frame.
     {
         winrt::check_hresult(m_commandListBegin->Reset(m_commandAllocator.get(), nullptr));
-        m_commandListBegin->ResourceBarrier(1, m_swapChain->PrepareForRender());
+        m_commandListBegin->ResourceBarrier(1, m_swapChain->GetRenderTarget()->PrepareForRender());
         static const float clearColor[] = { 0.0f, 0.0f, 0.0f, 0.0f };
         m_commandListBegin->ClearRenderTargetView(m_swapChain->GetRenderTarget()->GetCPUDescriptorHandle(), clearColor, 0, nullptr);
         winrt::check_hresult(m_commandListBegin->Close());
@@ -57,7 +57,7 @@ void Vortex::Renderer::Execute()
     // End frame.
     {
         winrt::check_hresult(m_commandListEnd->Reset(m_commandAllocator.get(), nullptr));
-        m_commandListEnd->ResourceBarrier(1, m_swapChain->PrepareForPresent());
+        m_commandListEnd->ResourceBarrier(1, m_swapChain->GetRenderTarget()->PrepareForPresent());
         winrt::check_hresult(m_commandListEnd->Close());
     }
     commandLists.push_back(m_commandListEnd.get());
