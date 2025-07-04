@@ -17,19 +17,9 @@ namespace Vortex
 		inline const CD3DX12_VIEWPORT* GetViewport() const { return &m_viewport; }
 		inline const CD3DX12_RECT* GetScissorRect() const { return &m_scissorRect; }
 
-		const CD3DX12_RESOURCE_BARRIER* PrepareForPresent() const
-		{
-			return &m_presentBarriers[m_swapChain->GetCurrentBackBufferIndex()];
-		}
-
-		const CD3DX12_RESOURCE_BARRIER* PrepareForRender() const
-		{
-			return &m_renderBarriers[m_swapChain->GetCurrentBackBufferIndex()];
-		}
-
 		const RenderTarget* GetRenderTarget() const
 		{
-			return &m_renderTargets[m_swapChain->GetCurrentBackBufferIndex()];
+			return &m_renderTarget;
 		}
 
 		inline void Flip() {
@@ -42,8 +32,6 @@ namespace Vortex
 		// Render targets
 		winrt::com_ptr<IDXGISwapChain3> m_swapChain;
 
-		RenderTarget m_renderTargets[VX_DOUBLE_BUFFER];
-		CD3DX12_RESOURCE_BARRIER m_presentBarriers[VX_DOUBLE_BUFFER];
-		CD3DX12_RESOURCE_BARRIER m_renderBarriers[VX_DOUBLE_BUFFER];
+		RenderTarget m_renderTarget;
 	};
 }
