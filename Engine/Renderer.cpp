@@ -1,13 +1,11 @@
 #include "pch.h"
 #include "Renderer.h"
 
-Vortex::Renderer::Renderer(HWND hWnd, uint32_t width, uint32_t height) :
+Vortex::Renderer::Renderer(HWND hWnd) :
     m_fenceEvent(::CreateEvent(nullptr, FALSE, FALSE, nullptr)), m_fenceValue(0),
     m_timeSinceStart(std::chrono::steady_clock::now()),
     m_camera(std::make_shared<Camera>()),
-    m_globalParams(std::make_shared<GlobalParameters>()),
-	m_viewport(0.0f, 0.0f, static_cast<float>(width), static_cast<float>(height)),
-	m_scissorRect(0, 0, static_cast<LONG>(width), static_cast<LONG>(height))
+    m_globalParams(std::make_shared<GlobalParameters>())
 {
     winrt::check_bool(bool{ m_fenceEvent });
 
@@ -21,12 +19,16 @@ Vortex::Renderer::Renderer(HWND hWnd, uint32_t width, uint32_t height) :
     m_commandListBegin = VX_DEVICE0->CreateGraphicsCommandList();
     m_commandListEnd = VX_DEVICE0->CreateGraphicsCommandList();
 
-    m_renderTarget = std::make_shared<RenderTarget>(hWnd, m_commandQueue);
+    m_renderTarget = std::make_unique<RenderTarget>(hWnd, m_commandQueue);
+	uint32_t width = m_renderTarget->GetWidth();
+	uint32_t height = m_renderTarget->GetHeight();
+	m_viewport = CD3DX12_VIEWPORT(0.0f, 0.0f, static_cast<float>(width), static_cast<float>(height));
+	m_scissorRect = CD3DX12_RECT(0, 0, static_cast<LONG>(width), static_cast<LONG>(height));
 
     winrt::check_hresult(GameInputCreate(m_gameInput.put()));
     //winrt::check_hresult(RegisterReadingCallback(m_gameMouse, GameInputKindMouse, 0, ));
     
-    Vortex::Device::CreateResourceHeap(VX_0, 4);
+    Device::CreateResourceHeap(VX_0, 4);
     m_constantResource = VX_DEVICE0->CreateConstantResource((sizeof(GlobalParameters) + 255) & ~255);
     m_cbvGpuHandle = VX_DEVICE0->CreateCBV(0, m_constantResource, (sizeof(GlobalParameters) + 255) & ~255);
 }
