@@ -72,7 +72,7 @@ namespace Vortex
             m_commandList->RSSetViewports(1, swapChain->GetViewport());
             m_commandList->RSSetScissorRects(1, swapChain->GetScissorRect());
 
-            CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle = swapChain->GetBackBufferRTVHandle();
+            D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = swapChain->GetRenderTarget()->GetCPUDescriptorHandle();
             m_commandList->OMSetRenderTargets(1, &rtvHandle, FALSE, nullptr);
 
             std::vector<ID3D12DescriptorHeap*> heaps = VX_DEVICE0->GetHeaps();

@@ -49,9 +49,7 @@ namespace Vortex
 
 		winrt::com_ptr<IDXGISwapChain3> CreateSwapChain(
 			HWND hWnd, uint32_t width, uint32_t height,
-			const winrt::com_ptr<ID3D12CommandQueue>& commandQueue,
-			winrt::com_ptr<ID3D12Resource> renderTargets[VX_DOUBLE_BUFFER],
-            winrt::com_ptr<ID3D12DescriptorHeap>& rtvHeap, uint32_t& descriptorSize) const;
+			const winrt::com_ptr<ID3D12CommandQueue>& commandQueue);
 
 		winrt::com_ptr<ID3D12RootSignature> CreateRootSignature(CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC versionedRootSignatureDesc) const;
 
@@ -99,13 +97,18 @@ namespace Vortex
 
         CD3DX12_GPU_DESCRIPTOR_HANDLE CreateUAV(uint32_t index, const winrt::com_ptr<ID3D12Resource>& resource, DXGI_FORMAT format) const;
 
+        D3D12_CPU_DESCRIPTOR_HANDLE CreateRTV(const winrt::com_ptr<ID3D12Resource>& resource);
+
 
 		winrt::com_ptr<ID3D12DescriptorHeap> CreateSamplerHeap();
-		winrt::com_ptr<ID3D12DescriptorHeap> CreateRTVHeap();
 		winrt::com_ptr<ID3D12DescriptorHeap> CreateDSVHeap();
 
 	private:
 		// GPU Resources
+		winrt::com_ptr<ID3D12DescriptorHeap> m_rtvHeap;
+		uint32_t m_rtvHandleSize;
+		int32_t m_rtvHandleIndex;
+
 		winrt::com_ptr<ID3D12DescriptorHeap> m_resourceHeap;
 		winrt::com_ptr<ID3D12DescriptorHeap> m_samplerHeap;
 		winrt::com_ptr<ID3D12DescriptorHeap> m_computeHeap;
