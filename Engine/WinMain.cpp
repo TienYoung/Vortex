@@ -48,7 +48,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, PWSTR /*pC
         &vxInstance        // Additional application data
     );
 
-    vxInstance.pRenderer = new Vortex::Renderer(hWnd, WINDOW_WIDTH, WINDOW_HEIGHT);
+    vxInstance.pRenderer = new Vortex::Renderer(hWnd);
     vxInstance.pRenderer->AddPass<Vortex::SkyboxRenderPass>();
     vxInstance.pRenderer->AddPass<Vortex::MeshRenderPass>();
 

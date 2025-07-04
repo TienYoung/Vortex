@@ -40,7 +40,7 @@ namespace Vortex
         Renderer& operator=(const Renderer&) = delete;
         Renderer& operator=(Renderer&&) = delete;
 
-		Renderer(HWND hwnd, uint32_t width, uint32_t height);
+		Renderer(HWND hWnd);
 		~Renderer();
 
 		void WaitForPreviousFrame();
@@ -68,7 +68,7 @@ namespace Vortex
 		winrt::com_ptr<ID3D12GraphicsCommandList6> m_commandListBegin;
 		winrt::com_ptr<ID3D12GraphicsCommandList6> m_commandListEnd;
 
-		std::shared_ptr<RenderTarget> m_renderTarget;
+		std::unique_ptr<RenderTarget> m_renderTarget;
 
 		std::vector<std::unique_ptr<IRenderPass>> m_passes;
 
@@ -93,8 +93,7 @@ namespace Vortex
 
 	public:
         inline CD3DX12_GPU_DESCRIPTOR_HANDLE GetGlobalParamsHandle() const { return m_cbvGpuHandle; }
-		inline std::shared_ptr<RenderTarget> GetRenderTarget() const { return m_renderTarget; }
-
+		inline const RenderTarget* GetRenderTarget() const { return m_renderTarget.get(); }
 		inline const D3D12_VIEWPORT* GetViewport() const { return &m_viewport; }
 		inline const D3D12_RECT* GetScissorRect() const { return &m_scissorRect; }
 	};
