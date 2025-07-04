@@ -48,8 +48,7 @@ namespace Vortex
         winrt::com_ptr<ID3D12GraphicsCommandList6> CreateCopyCommandList() const;
 
 		winrt::com_ptr<IDXGISwapChain3> CreateSwapChain(
-			HWND hWnd, uint32_t width, uint32_t height,
-			const winrt::com_ptr<ID3D12CommandQueue>& commandQueue);
+			HWND hWnd, const winrt::com_ptr<ID3D12CommandQueue>& commandQueue);
 
 		winrt::com_ptr<ID3D12RootSignature> CreateRootSignature(CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC versionedRootSignatureDesc) const;
 

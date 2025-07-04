@@ -146,14 +146,12 @@ winrt::com_ptr<ID3D12GraphicsCommandList6> Vortex::Device::CreateCopyCommandList
 	return commandList;
 }
 
-winrt::com_ptr<IDXGISwapChain3> Vortex::Device::CreateSwapChain(
-	HWND hWnd, uint32_t width, uint32_t height,
-	const winrt::com_ptr<ID3D12CommandQueue>& commandQueue)
+winrt::com_ptr<IDXGISwapChain3> Vortex::Device::CreateSwapChain(HWND hWnd, const winrt::com_ptr<ID3D12CommandQueue>& commandQueue)
 {
 	// Create a swap chain.
 	DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
-	swapChainDesc.Width = width;
-	swapChainDesc.Height = height;
+	swapChainDesc.Width = 0;
+	swapChainDesc.Height = 0;
 	swapChainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	swapChainDesc.Stereo = FALSE;
 	swapChainDesc.SampleDesc.Count = 1;

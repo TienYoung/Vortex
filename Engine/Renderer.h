@@ -3,7 +3,7 @@
 #include "Device.h"
 #include "Shader.h"
 #include "Camera.h"
-#include "SwapChain.h"
+#include "RenderTarget.h"
 
 namespace Vortex
 {
@@ -15,7 +15,7 @@ namespace Vortex
 		public:
 			virtual ~IRenderPass() = default;
 
-            inline virtual ID3D12GraphicsCommandList* GetCommandList(std::shared_ptr<SwapChain> swapChain, const Renderer& renderer) const = 0;
+            inline virtual ID3D12GraphicsCommandList* GetCommandList(const Renderer& renderer) const = 0;
             //inline virtual ID3D12DescriptorHeap* GetDescriptorHeap() const = 0;
 		};
 
@@ -68,7 +68,7 @@ namespace Vortex
 		winrt::com_ptr<ID3D12GraphicsCommandList6> m_commandListBegin;
 		winrt::com_ptr<ID3D12GraphicsCommandList6> m_commandListEnd;
 
-		std::shared_ptr<SwapChain> m_swapChain;
+		std::shared_ptr<RenderTarget> m_renderTarget;
 
 		std::vector<std::unique_ptr<IRenderPass>> m_passes;
 
@@ -88,7 +88,14 @@ namespace Vortex
 		winrt::com_ptr<IGameInput> m_gameInput;
 		winrt::com_ptr<IGameInputDevice> m_gameDevice;
 
+		D3D12_VIEWPORT m_viewport;
+		D3D12_RECT m_scissorRect;
+
 	public:
         inline CD3DX12_GPU_DESCRIPTOR_HANDLE GetGlobalParamsHandle() const { return m_cbvGpuHandle; }
+		inline std::shared_ptr<RenderTarget> GetRenderTarget() const { return m_renderTarget; }
+
+		inline const D3D12_VIEWPORT* GetViewport() const { return &m_viewport; }
+		inline const D3D12_RECT* GetScissorRect() const { return &m_scissorRect; }
 	};
 }

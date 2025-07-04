@@ -2,6 +2,9 @@
 #include "MeshRenderPass.h"
 #include "SkyboxRenderPass.h"
 
+extern "C" { __declspec(dllexport) extern const UINT D3D12SDKVersion = 616; }
+extern "C" { __declspec(dllexport) extern const char* D3D12SDKPath = ".\\D3D12\\"; }
+
 LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 struct VortexInstance

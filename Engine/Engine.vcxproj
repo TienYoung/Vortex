@@ -132,7 +132,6 @@
     </ClInclude>
     <ClInclude Include="RenderTarget.h" />
     <ClInclude Include="SkyboxRenderPass.h" />
-    <ClInclude Include="SwapChain.h" />
     <CopyFileToFolders Include="Assets\Shaders\ShaderUniforms.h">
       <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)Assets\Shaders</DestinationFolders>
       <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)Assets\Shaders</DestinationFolders>
@@ -151,7 +150,6 @@
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="RenderTarget.cpp" />
     <ClCompile Include="Shader.cpp" />
-    <ClCompile Include="SwapChain.cpp" />
     <ClCompile Include="WinMain.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
