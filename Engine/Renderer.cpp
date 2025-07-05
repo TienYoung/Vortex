@@ -31,12 +31,12 @@ Vortex::Renderer::Renderer(HWND hWnd) :
     Device::CreateResourceHeap(VX_0, 4);
     m_constantResource = VX_DEVICE0->CreateConstantResource((sizeof(GlobalParameters) + 255) & ~255);
     m_cbvGpuHandle = VX_DEVICE0->CreateCBV(0, m_constantResource, (sizeof(GlobalParameters) + 255) & ~255);
+
+    WaitForPreviousFrame();
 }
 
 void Vortex::Renderer::Execute()
 {
-    WaitForPreviousFrame();
-
     Update();
 
     winrt::check_hresult(m_commandAllocator->Reset());
@@ -70,6 +70,8 @@ void Vortex::Renderer::Execute()
     m_commandQueue->ExecuteCommandLists(static_cast<uint32_t>(commandLists.size()), commandLists.data());
 
     m_renderTarget->Flip();
+
+    WaitForPreviousFrame();
 }
 
 Vortex::Renderer::~Renderer()
@@ -91,8 +93,9 @@ void Vortex::Renderer::WaitForPreviousFrame()
     // maximize GPU utilization.
 
     // Signal and increment the fence value.
-    const uint64_t fence = m_fenceValue++;
+    const uint64_t fence = m_fenceValue;
     winrt::check_hresult(m_commandQueue->Signal(m_fence.get(), fence));
+    m_fenceValue++;
 
     // Wait until the previous frame is finished.
     if (m_fence->GetCompletedValue() < fence)
