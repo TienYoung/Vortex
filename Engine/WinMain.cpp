@@ -12,8 +12,8 @@ struct VortexInstance
     Vortex::Renderer* pRenderer;
 };
 
-#define WINDOW_WIDTH 640
-#define WINDOW_HEIGHT 640
+#define WINDOW_WIDTH 1280
+#define WINDOW_HEIGHT 800
 
 _Use_decl_annotations_
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, PWSTR /*pCmdLine*/, int nCmdShow)

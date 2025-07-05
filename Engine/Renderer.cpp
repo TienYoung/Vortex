@@ -22,7 +22,7 @@ Vortex::Renderer::Renderer(HWND hWnd) :
     m_renderTarget = std::make_unique<RenderTarget>(hWnd, m_commandQueue);
 	uint32_t width = m_renderTarget->GetWidth();
 	uint32_t height = m_renderTarget->GetHeight();
-	m_viewport = CD3DX12_VIEWPORT(0.0f, 0.0f, static_cast<float>(width), static_cast<float>(height));
+	m_viewport = CD3DX12_VIEWPORT(0.0f, 0.0f, static_cast<FLOAT>(width), static_cast<FLOAT>(height));
 	m_scissorRect = CD3DX12_RECT(0, 0, static_cast<LONG>(width), static_cast<LONG>(height));
 
     winrt::check_hresult(GameInputCreate(m_gameInput.put()));
@@ -103,52 +103,7 @@ void Vortex::Renderer::WaitForPreviousFrame()
         winrt::check_hresult(m_fence->SetEventOnCompletion(fence, m_fenceEvent.get()));
         ::WaitForSingleObject(m_fenceEvent.get(), INFINITE);
     }
-
-    //m_frameIndex = m_swapChain->GetCurrentBackBufferIndex();
 }
-//
-//void Vortex::Renderer::UploadTexture()
-//{
-//    D3D12_SUBRESOURCE_DATA subresourceData;
-//    std::unique_ptr<uint8_t[]> decodedData;
-//    winrt::check_hresult(DirectX::LoadWICTextureFromFile(m_device.get(), m_textureFilename.c_str(), m_srvResource.put(), decodedData, subresourceData));
-//
-//    winrt::com_ptr<ID3D12Resource> uploadResource;
-//    const UINT64 uploadBufferSize = GetRequiredIntermediateSize(m_srvResource.get(), 0, 1);
-//    D3D12_HEAP_PROPERTIES uploadHeapProperties = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
-//    D3D12_RESOURCE_DESC bufferDesc = CD3DX12_RESOURCE_DESC::Buffer(uploadBufferSize);
-//    winrt::check_hresult(m_device->CreateCommittedResource(
-//        &uploadHeapProperties,
-//        D3D12_HEAP_FLAG_NONE,
-//        &bufferDesc,
-//        D3D12_RESOURCE_STATE_GENERIC_READ,
-//        nullptr,
-//        IID_PPV_ARGS(&uploadResource)
-//    ));
-//
-//    UpdateSubresources(m_commandList.get(), m_srvResource.get(), uploadResource.get(), 0, 0, 1, &subresourceData);
-//}
-//
-
-//
-//winrt::com_ptr<ID3D12DescriptorHeap> Vortex::Renderer::CreateSamplerHeap()
-//{
-//	winrt::com_ptr<ID3D12DescriptorHeap> samplerHeap;
-//	D3D12_DESCRIPTOR_HEAP_DESC samplerHeapDesc = {};
-//	samplerHeapDesc.NumDescriptors = 1;
-//	samplerHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-//	samplerHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER;
-//	winrt::check_hresult(m_device->CreateDescriptorHeap(&samplerHeapDesc, IID_PPV_ARGS(&samplerHeap)));
-//
-//	D3D12_SAMPLER_DESC samplerDesc = {};
-//	samplerDesc.AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
-//	samplerDesc.AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
-//	samplerDesc.AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
-//	m_device->CreateSampler(&samplerDesc, samplerHeap->GetCPUDescriptorHandleForHeapStart());
-//
-//	return samplerHeap;
-//}
-
 
 void Vortex::Renderer::Update()
 {
@@ -200,7 +155,8 @@ void Vortex::Renderer::Update()
         }
 
         m_globalParams->view = DirectX::XMMatrixTranspose(m_camera->GetView());
-        m_globalParams->projection = DirectX::XMMatrixTranspose(m_camera->GetProjection());
+        float aspect = m_viewport.Width / m_viewport.Height;
+        m_globalParams->projection = DirectX::XMMatrixTranspose(m_camera->GetProjection(aspect));
         m_globalParams->time = std::chrono::duration<float>(std::chrono::steady_clock::now() - m_timeSinceStart).count();
         uint8_t* gpuPtr = nullptr;
         CD3DX12_RANGE range(0, 0);

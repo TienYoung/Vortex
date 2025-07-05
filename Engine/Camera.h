@@ -17,9 +17,9 @@ namespace Vortex
             return view;
         }
 
-        inline Matrix GetProjection() const
+        inline Matrix GetProjection(float aspect) const
         {
-            Matrix projection = DirectX::XMMatrixPerspectiveFovLH(90.0f, 1.0f, 0.1f, 10000.0f);
+            Matrix projection = DirectX::XMMatrixPerspectiveFovLH(90.0f, aspect, 0.1f, 10000.0f);
             return projection;
         }
 
