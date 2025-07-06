@@ -31,7 +31,7 @@ namespace Vortex
             m_commandList = VX_DEVICE0->CreateGraphicsCommandList();
         }
 
-        inline ID3D12GraphicsCommandList* GetCommandList(const Renderer& renderer) const override
+        inline ID3D12GraphicsCommandList10* GetCommandList(const Renderer& renderer) const override
         {
             winrt::check_hresult(m_commandAllocator->Reset());
             winrt::check_hresult(m_commandList->Reset(m_commandAllocator.get(), nullptr));
@@ -61,6 +61,6 @@ namespace Vortex
         winrt::com_ptr<ID3D12PipelineState> m_skyboxPSO;
         // Command
         winrt::com_ptr<ID3D12CommandAllocator> m_commandAllocator;
-        winrt::com_ptr<ID3D12GraphicsCommandList6> m_commandList;
+        winrt::com_ptr<ID3D12GraphicsCommandList10> m_commandList;
     };
 }

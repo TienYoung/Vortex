@@ -15,7 +15,7 @@ namespace Vortex
 		public:
 			virtual ~IRenderPass() = default;
 
-            inline virtual ID3D12GraphicsCommandList* GetCommandList(const Renderer& renderer) const = 0;
+            inline virtual ID3D12GraphicsCommandList10* GetCommandList(const Renderer& renderer) const = 0;
             //inline virtual ID3D12DescriptorHeap* GetDescriptorHeap() const = 0;
 		};
 
@@ -65,8 +65,8 @@ namespace Vortex
 
 		winrt::com_ptr<ID3D12CommandQueue> m_commandQueue;
 		winrt::com_ptr<ID3D12CommandAllocator> m_commandAllocator;
-		winrt::com_ptr<ID3D12GraphicsCommandList6> m_commandListBegin;
-		winrt::com_ptr<ID3D12GraphicsCommandList6> m_commandListEnd;
+		winrt::com_ptr<ID3D12GraphicsCommandList10> m_commandListBegin;
+		winrt::com_ptr<ID3D12GraphicsCommandList10> m_commandListEnd;
 
 		std::unique_ptr<RenderTarget> m_renderTarget;
 

@@ -30,7 +30,7 @@ namespace Vortex
 	private:
 		// Variables
 		DXGI_ADAPTER_DESC2 m_adapterDesc;
-		winrt::com_ptr<ID3D12Device5> m_d3d12Device;
+		winrt::com_ptr<ID3D12Device14> m_d3d12Device;
 	public:
 		// Wrapped functions
 		winrt::com_ptr<ID3D12Fence1> CreateFence(uint64_t value) const;
@@ -42,7 +42,7 @@ namespace Vortex
 		winrt::com_ptr<ID3D12CommandAllocator> CreateComputeCommandAllocator() const;
 		winrt::com_ptr<ID3D12CommandAllocator> CreateBundleCommandAllocator() const;
 		winrt::com_ptr<ID3D12CommandAllocator> CreateCopyCommandAllocator() const;
-        winrt::com_ptr<ID3D12GraphicsCommandList6> CreateGraphicsCommandList() const;
+        winrt::com_ptr<ID3D12GraphicsCommandList10> CreateGraphicsCommandList() const;
         winrt::com_ptr<ID3D12GraphicsCommandList6> CreateComputeCommandList() const;
         winrt::com_ptr<ID3D12GraphicsCommandList6> CreateBundleCommandList() const;
         winrt::com_ptr<ID3D12GraphicsCommandList6> CreateCopyCommandList() const;
@@ -54,7 +54,12 @@ namespace Vortex
         winrt::com_ptr<ID3D12PipelineState> CreateMeshPSO(
             const winrt::com_ptr<ID3D12RootSignature>& rootSignature,
             const D3D12_SHADER_BYTECODE& mesh, const D3D12_SHADER_BYTECODE& pixel,
-            const D3D12_SHADER_BYTECODE& amplification = { NULL, 0 }) const;
+            const D3D12_SHADER_BYTECODE& amplification = { nullptr, 0 }) const;
+
+		D3D12_SET_PROGRAM_DESC CreateMeshProgramDesc(
+			const winrt::com_ptr<ID3D12RootSignature>& rootSignature,
+			const D3D12_SHADER_BYTECODE& mesh, const D3D12_SHADER_BYTECODE& pixel,
+			const D3D12_SHADER_BYTECODE& amplification = { nullptr, 0 }) const;
 
         winrt::com_ptr<ID3D12PipelineState> CreateComputePSO(
             const winrt::com_ptr<ID3D12RootSignature>& rootSignature,

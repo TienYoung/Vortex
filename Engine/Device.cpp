@@ -26,10 +26,13 @@ void Vortex::Device::Initialize()
 	winrt::check_hresult(CreateDXGIFactory2(dxgiFactoryFlags, IID_PPV_ARGS(&s_dxgiFactory)));
 
 	winrt::com_ptr<IDXGIAdapter3> hardwareAdapter;
-	for (uint32_t i = 0; SUCCEEDED(s_dxgiFactory->EnumAdapterByGpuPreference(i, DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE, IID_PPV_ARGS(&hardwareAdapter))); ++i)
-	{
-		s_deviceList.push_back(hardwareAdapter);
-	}
+	winrt::check_hresult(s_dxgiFactory->EnumAdapterByGpuPreference(0, DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE, IID_PPV_ARGS(&hardwareAdapter)));
+	s_deviceList.push_back(hardwareAdapter);
+
+	//for (uint32_t i = 0; SUCCEEDED(s_dxgiFactory->EnumAdapterByGpuPreference(i, DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE, IID_PPV_ARGS(&hardwareAdapter))); ++i)
+	//{
+	//	s_deviceList.push_back(hardwareAdapter);
+	//}
 }
 
 Vortex::Device::Device(const winrt::com_ptr<IDXGIAdapter3>& adaptor) :
@@ -118,9 +121,9 @@ winrt::com_ptr<ID3D12CommandAllocator> Vortex::Device::CreateCopyCommandAllocato
 	return commandAllocator;
 }
 
-winrt::com_ptr<ID3D12GraphicsCommandList6> Vortex::Device::CreateGraphicsCommandList() const
+winrt::com_ptr<ID3D12GraphicsCommandList10> Vortex::Device::CreateGraphicsCommandList() const
 {
-	winrt::com_ptr<ID3D12GraphicsCommandList6> commandList;
+	winrt::com_ptr<ID3D12GraphicsCommandList10> commandList;
 	winrt::check_hresult(m_d3d12Device->CreateCommandList1(0, D3D12_COMMAND_LIST_TYPE_DIRECT, D3D12_COMMAND_LIST_FLAG_NONE, IID_PPV_ARGS(&commandList)));
 	return commandList;
 }
@@ -223,6 +226,69 @@ winrt::com_ptr<ID3D12PipelineState> Vortex::Device::CreateMeshPSO(
 	winrt::com_ptr<ID3D12PipelineState> pipelineState;
 	winrt::check_hresult(m_d3d12Device->CreatePipelineState(&streamDesc, IID_PPV_ARGS(&pipelineState)));
 	return pipelineState;
+}
+
+D3D12_SET_PROGRAM_DESC Vortex::Device::CreateMeshProgramDesc(
+	const winrt::com_ptr<ID3D12RootSignature>& rootSignature,
+	const D3D12_SHADER_BYTECODE& mesh, const D3D12_SHADER_BYTECODE& pixel,
+	const D3D12_SHADER_BYTECODE& amplification/* = { NULL, 0 }*/) const
+{
+    CD3DX12_STATE_OBJECT_DESC soDesc{ D3D12_STATE_OBJECT_TYPE_EXECUTABLE };
+
+	auto cfSubobject = soDesc.CreateSubobject<CD3DX12_STATE_OBJECT_CONFIG_SUBOBJECT>();
+	cfSubobject->SetFlags(D3D12_STATE_OBJECT_FLAG_ALLOW_STATE_OBJECT_ADDITIONS);
+
+	// Add global signature
+	auto rsSubobject = soDesc.CreateSubobject<CD3DX12_GLOBAL_ROOT_SIGNATURE_SUBOBJECT>();
+	rsSubobject->SetRootSignature(rootSignature.get());
+
+	// Add compiled shaders
+    auto asSubobject = soDesc.CreateSubobject<CD3DX12_DXIL_LIBRARY_SUBOBJECT>();
+	asSubobject->SetDXILLibrary(&amplification);
+	asSubobject->DefineExport(L"ASMain", L"*");
+    auto msSubobject = soDesc.CreateSubobject<CD3DX12_DXIL_LIBRARY_SUBOBJECT>();
+	msSubobject->SetDXILLibrary(&mesh);
+	msSubobject->DefineExport(L"MSMain", L"*");
+    auto psSubobject = soDesc.CreateSubobject<CD3DX12_DXIL_LIBRARY_SUBOBJECT>();
+	psSubobject->SetDXILLibrary(&pixel);
+	psSubobject->DefineExport(L"PSMain", L"*");
+
+	// Add render target format
+	auto rtSubject = soDesc.CreateSubobject<CD3DX12_RENDER_TARGET_FORMATS_SUBOBJECT>();
+	rtSubject->SetNumRenderTargets(1);
+	rtSubject->SetRenderTargetFormat(0, DXGI_FORMAT_R8G8B8A8_UNORM);
+
+	// Add generic program
+	auto gpSubobject = soDesc.CreateSubobject<CD3DX12_GENERIC_PROGRAM_SUBOBJECT>();
+	gpSubobject->SetProgramName(L"proceduralMesh");
+	gpSubobject->AddExport(L"ASMain");
+	gpSubobject->AddExport(L"MSMain");
+	gpSubobject->AddExport(L"PSMain");
+	gpSubobject->AddSubobject(*rtSubject);
+
+    // Create Mesh state object
+	winrt::com_ptr<ID3D12StateObject> stateObject;
+	winrt::check_hresult(m_d3d12Device->CreateStateObject(soDesc, IID_PPV_ARGS(&stateObject)));
+
+	// Get program desc
+	//D3D12_SET_PROGRAM_DESC programDesc =
+	//{
+	//	.Type = D3D12_PROGRAM_TYPE_GENERIC_PIPELINE,
+	//	.GenericPipeline = D3D12_SET_GENERIC_PIPELINE_DESC
+	//	{
+	//		.ProgramIdentifier = stateObject.as<ID3D12StateObjectProperties1>()->GetProgramIdentifier(L"proceduralMesh")
+	//	}
+	//};
+
+	winrt::com_ptr<ID3D12StateObjectProperties1> pSOProperties;
+	winrt::check_hresult(stateObject->QueryInterface(IID_PPV_ARGS(&pSOProperties)));
+	auto program = pSOProperties->GetProgramIdentifier(L"proceduralMesh");
+	
+	D3D12_SET_PROGRAM_DESC programDesc;
+	programDesc.Type = D3D12_PROGRAM_TYPE_GENERIC_PIPELINE;
+	programDesc.GenericPipeline.ProgramIdentifier = program;
+
+	return programDesc;
 }
 
 winrt::com_ptr<ID3D12PipelineState> Vortex::Device::CreateComputePSO(const winrt::com_ptr<ID3D12RootSignature>& rootSignature, const D3D12_SHADER_BYTECODE& compute) const

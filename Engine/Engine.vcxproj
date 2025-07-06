@@ -136,10 +136,11 @@
       <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)Assets\Shaders</DestinationFolders>
       <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)Assets\Shaders</DestinationFolders>
     </CopyFileToFolders>
-    <CopyFileToFolders Include="Assets\Shaders\Procedural.hlsli">
+    <None Include="Assets\Shaders\Procedural.hlsli">
       <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)Assets\Shaders</DestinationFolders>
       <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)Assets\Shaders</DestinationFolders>
-    </CopyFileToFolders>
+      <FileType>Document</FileType>
+    </None>
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Device.h" />
     <ClInclude Include="Math.h" />
@@ -189,21 +190,24 @@
     </CopyFileToFolders>
   </ItemGroup>
   <ItemGroup>
-    <CopyFileToFolders Include="Assets\Shaders\ProceduralAS.hlsl">
+    <FxCompile Include="Assets\Shaders\ProceduralAS.hlsl">
       <FileType>Document</FileType>
       <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)Assets\Shaders</DestinationFolders>
       <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)Assets\Shaders</DestinationFolders>
-    </CopyFileToFolders>
-    <CopyFileToFolders Include="Assets\Shaders\ProceduralMS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Amplification</ShaderType>
+    </FxCompile>
+    <FxCompile Include="Assets\Shaders\ProceduralMS.hlsl">
       <FileType>Document</FileType>
       <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)Assets\Shaders</DestinationFolders>
       <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)Assets\Shaders</DestinationFolders>
-    </CopyFileToFolders>
-    <CopyFileToFolders Include="Assets\Shaders\ProceduralPS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Mesh</ShaderType>
+    </FxCompile>
+    <FxCompile Include="Assets\Shaders\ProceduralPS.hlsl">
       <FileType>Document</FileType>
       <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)Assets\Shaders</DestinationFolders>
       <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)Assets\Shaders</DestinationFolders>
-    </CopyFileToFolders>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <CopyFileToFolders Include="Assets\Shaders\NoiseCS.hlsl">
