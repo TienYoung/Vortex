@@ -3,8 +3,6 @@
 #include "Renderer.h"
 #include "Device.h"
 
-#include <CompiledShaders/Raytracing.hlsl.h>
-
 winrt::com_ptr<IDXGIFactory6> Vortex::Device::s_dxgiFactory;
 std::vector<Vortex::Device> Vortex::Device::s_deviceList;
 
@@ -228,7 +226,7 @@ winrt::com_ptr<ID3D12PipelineState> Vortex::Device::CreateMeshPSO(
 	return pipelineState;
 }
 
-D3D12_SET_PROGRAM_DESC Vortex::Device::CreateMeshProgramDesc(
+winrt::com_ptr<ID3D12StateObject> Vortex::Device::CreateMeshStateObject(
 	const winrt::com_ptr<ID3D12RootSignature>& rootSignature,
 	const D3D12_SHADER_BYTECODE& mesh, const D3D12_SHADER_BYTECODE& pixel,
 	const D3D12_SHADER_BYTECODE& amplification/* = { NULL, 0 }*/) const
@@ -270,25 +268,7 @@ D3D12_SET_PROGRAM_DESC Vortex::Device::CreateMeshProgramDesc(
 	winrt::com_ptr<ID3D12StateObject> stateObject;
 	winrt::check_hresult(m_d3d12Device->CreateStateObject(soDesc, IID_PPV_ARGS(&stateObject)));
 
-	// Get program desc
-	//D3D12_SET_PROGRAM_DESC programDesc =
-	//{
-	//	.Type = D3D12_PROGRAM_TYPE_GENERIC_PIPELINE,
-	//	.GenericPipeline = D3D12_SET_GENERIC_PIPELINE_DESC
-	//	{
-	//		.ProgramIdentifier = stateObject.as<ID3D12StateObjectProperties1>()->GetProgramIdentifier(L"proceduralMesh")
-	//	}
-	//};
-
-	winrt::com_ptr<ID3D12StateObjectProperties1> pSOProperties;
-	winrt::check_hresult(stateObject->QueryInterface(IID_PPV_ARGS(&pSOProperties)));
-	auto program = pSOProperties->GetProgramIdentifier(L"proceduralMesh");
-	
-	D3D12_SET_PROGRAM_DESC programDesc;
-	programDesc.Type = D3D12_PROGRAM_TYPE_GENERIC_PIPELINE;
-	programDesc.GenericPipeline.ProgramIdentifier = program;
-
-	return programDesc;
+	return stateObject;
 }
 
 winrt::com_ptr<ID3D12PipelineState> Vortex::Device::CreateComputePSO(const winrt::com_ptr<ID3D12RootSignature>& rootSignature, const D3D12_SHADER_BYTECODE& compute) const
@@ -305,27 +285,23 @@ winrt::com_ptr<ID3D12PipelineState> Vortex::Device::CreateComputePSO(const winrt
 	return pipelineState;
 }
 
-//winrt::com_ptr<ID3D12PipelineState> Vortex::Device::CreateRayTracingPSO(const winrt::com_ptr<ID3D12RootSignature>& rootSignature, const D3D12_SHADER_BYTECODE& raygen) const
-//{
-//    CD3DX12_STATE_OBJECT_DESC dxrStateObjectDesc{ D3D12_STATE_OBJECT_TYPE_RAYTRACING_PIPELINE };
-//	// Add compiled shaders
-//    auto lib = dxrStateObjectDesc.CreateSubobject<CD3DX12_DXIL_LIBRARY_SUBOBJECT>();
-//    D3D12_SHADER_BYTECODE libdxil = CD3DX12_SHADER_BYTECODE((void*)g_pRaytracing, ARRAYSIZE(g_pRaytracing));
-//    lib->SetDXILLibrary(&libdxil);
-//    lib->DefineExport(L"MyRaygenShader");
-//    lib->DefineExport(L"MyMissShader");
-//
-//    // Create DXR PSO
-//	winrt::com_ptr<ID3D12StateObject> dxrStateObject;
-//	winrt::check_hresult(m_d3d12Device->CreateStateObject(dxrStateObjectDesc, IID_PPV_ARGS(&dxrStateObject)));
-//
-//    // Build Acceleration Struct
-//
-//	winrt::com_ptr<ID3D12StateObjectProperties> rtpso;
-//	rtpso = dxrStateObject.as<ID3D12StateObjectProperties>();
-//	rtpso->GetShaderIdentifier(L"raygen_main");
-//	rtpso->GetShaderIdentifier(L"miss_main");
-//}
+winrt::com_ptr<ID3D12StateObject> Vortex::Device::CreateRayTracingStateOject(const winrt::com_ptr<ID3D12RootSignature>& rootSignature, const D3D12_SHADER_BYTECODE& raygen) const
+{
+    CD3DX12_STATE_OBJECT_DESC soDesc{ D3D12_STATE_OBJECT_TYPE_RAYTRACING_PIPELINE };
+	// Add compiled shaders
+    auto libSubobject = soDesc.CreateSubobject<CD3DX12_DXIL_LIBRARY_SUBOBJECT>();
+	libSubobject->SetDXILLibrary(&raygen);
+	libSubobject->DefineExport(L"MyRaygenShader");
+	libSubobject->DefineExport(L"MyMissShader");
+
+	auto rsSubobject = soDesc.CreateSubobject<CD3DX12_GLOBAL_ROOT_SIGNATURE_SUBOBJECT>();
+	rsSubobject->SetRootSignature(rootSignature.get());
+
+    // Create DXR PSO
+	winrt::com_ptr<ID3D12StateObject> stateObject;
+	winrt::check_hresult(m_d3d12Device->CreateStateObject(soDesc, IID_PPV_ARGS(&stateObject)));
+	return stateObject;
+}
 
 winrt::com_ptr<ID3D12DescriptorHeap> Vortex::Device::CreateResourceHeap(uint32_t num) const
 {

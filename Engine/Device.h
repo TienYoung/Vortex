@@ -56,7 +56,7 @@ namespace Vortex
             const D3D12_SHADER_BYTECODE& mesh, const D3D12_SHADER_BYTECODE& pixel,
             const D3D12_SHADER_BYTECODE& amplification = { nullptr, 0 }) const;
 
-		D3D12_SET_PROGRAM_DESC CreateMeshProgramDesc(
+		winrt::com_ptr<ID3D12StateObject> CreateMeshStateObject(
 			const winrt::com_ptr<ID3D12RootSignature>& rootSignature,
 			const D3D12_SHADER_BYTECODE& mesh, const D3D12_SHADER_BYTECODE& pixel,
 			const D3D12_SHADER_BYTECODE& amplification = { nullptr, 0 }) const;
@@ -65,7 +65,7 @@ namespace Vortex
             const winrt::com_ptr<ID3D12RootSignature>& rootSignature,
             const D3D12_SHADER_BYTECODE& compute) const;
 
-		winrt::com_ptr<ID3D12PipelineState> CreateRayTracingPSO(
+		winrt::com_ptr<ID3D12StateObject> CreateRayTracingStateOject(
 			const winrt::com_ptr<ID3D12RootSignature>& rootSignature,
 			const D3D12_SHADER_BYTECODE& raygen) const;
 

@@ -57,7 +57,7 @@ namespace Vortex
 					CD3DX12_SHADER_BYTECODE(g_pProceduralAS, _countof(g_pProceduralAS))
 				);
 
-				m_programDesc = VX_DEVICE0->CreateMeshProgramDesc
+				m_meshStateObject = VX_DEVICE0->CreateMeshStateObject
 				(
 					m_rootSignature,
 					CD3DX12_SHADER_BYTECODE(g_pProceduralMS, _countof(g_pProceduralMS)),
@@ -105,8 +105,16 @@ namespace Vortex
 			transitionBarrier = CD3DX12_RESOURCE_BARRIER::Transition(m_textureResource.get(), D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
 			m_commandList->ResourceBarrier(1, &transitionBarrier);
 			m_commandList->SetGraphicsRootSignature(m_rootSignature.get());
-			m_commandList->SetPipelineState(m_graphicsPSO.get());
-			//m_commandList->SetProgram(&m_programDesc);
+			//m_commandList->SetPipelineState(m_graphicsPSO.get());
+			D3D12_SET_PROGRAM_DESC programDesc =
+			{
+				.Type = D3D12_PROGRAM_TYPE_GENERIC_PIPELINE,
+				.GenericPipeline =
+				{
+					.ProgramIdentifier = m_meshStateObject.as<ID3D12StateObjectProperties1>()->GetProgramIdentifier(L"proceduralMesh"),
+				},
+			};
+			m_commandList->SetProgram(&programDesc);
 			m_commandList->SetGraphicsRootDescriptorTable(0, renderer.GetGlobalParamsHandle());
 			m_commandList->SetGraphicsRootDescriptorTable(1, m_gpuHandle2);
 			m_commandList->DispatchMesh(1, 1, 1);
@@ -138,7 +146,7 @@ namespace Vortex
 		winrt::com_ptr<ID3D12RootSignature> m_rootSignature;
 		winrt::com_ptr<ID3D12PipelineState> m_computePSO;
 		winrt::com_ptr<ID3D12PipelineState> m_graphicsPSO;
-		D3D12_SET_PROGRAM_DESC m_programDesc;
+		winrt::com_ptr<ID3D12StateObject> m_meshStateObject;
 
 		// Command
 		winrt::com_ptr<ID3D12CommandAllocator> m_commandAllocator;
