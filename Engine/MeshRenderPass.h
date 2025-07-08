@@ -49,15 +49,7 @@ namespace Vortex
 				auto computeShader = std::make_shared<Shader>(L"NoiseCS");
 				m_computePSO = VX_DEVICE0->CreateComputePSO(m_rootSignature, computeShader->GetBytecode());
 
-				m_graphicsPSO = VX_DEVICE0->CreateMeshPSO
-				(
-					m_rootSignature,
-					CD3DX12_SHADER_BYTECODE(g_pProceduralMS, _countof(g_pProceduralMS)),
-					CD3DX12_SHADER_BYTECODE(g_pProceduralPS, _countof(g_pProceduralPS)),
-					CD3DX12_SHADER_BYTECODE(g_pProceduralAS, _countof(g_pProceduralAS))
-				);
-
-				m_meshStateObject = VX_DEVICE0->CreateMeshStateObject
+				m_pipelineStateObject = VX_DEVICE0->CreateMeshStateObject
 				(
 					m_rootSignature,
 					CD3DX12_SHADER_BYTECODE(g_pProceduralMS, _countof(g_pProceduralMS)),
@@ -70,7 +62,7 @@ namespace Vortex
 			}
 		}
 
-		inline ID3D12GraphicsCommandList10* GetCommandList(const Renderer& renderer) const override
+		inline ID3D12GraphicsCommandList10* GetCommandList(const Renderer* renderer) const override
 		{
 			uint8_t* gpuPtr = nullptr;
 			CD3DX12_RANGE range(0, 0);
@@ -83,10 +75,10 @@ namespace Vortex
 			winrt::check_hresult(m_commandAllocator->Reset());
 			winrt::check_hresult(m_commandList->Reset(m_commandAllocator.get(), nullptr));
 
-			m_commandList->RSSetViewports(1, renderer.GetViewport());
-			m_commandList->RSSetScissorRects(1, renderer.GetScissorRect());
+			m_commandList->RSSetViewports(1, renderer->GetViewport());
+			m_commandList->RSSetScissorRects(1, renderer->GetScissorRect());
 
-			D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = renderer.GetRenderTarget()->GetCPUDescriptorHandle();
+			D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = renderer->GetRenderTarget()->GetCPUDescriptorHandle();
 			m_commandList->OMSetRenderTargets(1, &rtvHandle, FALSE, nullptr);
 
 			std::vector<ID3D12DescriptorHeap*> heaps = VX_DEVICE0->GetHeaps();
@@ -105,17 +97,16 @@ namespace Vortex
 			transitionBarrier = CD3DX12_RESOURCE_BARRIER::Transition(m_textureResource.get(), D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
 			m_commandList->ResourceBarrier(1, &transitionBarrier);
 			m_commandList->SetGraphicsRootSignature(m_rootSignature.get());
-			//m_commandList->SetPipelineState(m_graphicsPSO.get());
 			D3D12_SET_PROGRAM_DESC programDesc =
 			{
 				.Type = D3D12_PROGRAM_TYPE_GENERIC_PIPELINE,
 				.GenericPipeline =
 				{
-					.ProgramIdentifier = m_meshStateObject.as<ID3D12StateObjectProperties1>()->GetProgramIdentifier(L"proceduralMesh"),
+					.ProgramIdentifier = m_pipelineStateObject.as<ID3D12StateObjectProperties1>()->GetProgramIdentifier(L"proceduralMesh"),
 				},
 			};
 			m_commandList->SetProgram(&programDesc);
-			m_commandList->SetGraphicsRootDescriptorTable(0, renderer.GetGlobalParamsHandle());
+			m_commandList->SetGraphicsRootDescriptorTable(0, renderer->GetGlobalParamsHandle());
 			m_commandList->SetGraphicsRootDescriptorTable(1, m_gpuHandle2);
 			m_commandList->DispatchMesh(1, 1, 1);
 
@@ -145,8 +136,7 @@ namespace Vortex
 		// Pipeline
 		winrt::com_ptr<ID3D12RootSignature> m_rootSignature;
 		winrt::com_ptr<ID3D12PipelineState> m_computePSO;
-		winrt::com_ptr<ID3D12PipelineState> m_graphicsPSO;
-		winrt::com_ptr<ID3D12StateObject> m_meshStateObject;
+		winrt::com_ptr<ID3D12StateObject> m_pipelineStateObject;
 
 		// Command
 		winrt::com_ptr<ID3D12CommandAllocator> m_commandAllocator;

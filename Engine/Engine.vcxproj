@@ -127,9 +127,11 @@
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="AccelerationStructure.h" />
     <ClInclude Include="Assets\Shaders\Raytracing.h">
       <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)Assets\Shaders</DestinationFolders>
     </ClInclude>
+    <ClInclude Include="RayTracingRenderPass.h" />
     <ClInclude Include="RenderTarget.h" />
     <ClInclude Include="SkyboxRenderPass.h" />
     <CopyFileToFolders Include="Assets\Shaders\ShaderUniforms.h">
@@ -147,6 +149,7 @@
     <ClInclude Include="MeshRenderPass.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Renderer.h" />
+    <ClCompile Include="AccelerationStructure.cpp" />
     <ClCompile Include="Device.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="RenderTarget.cpp" />

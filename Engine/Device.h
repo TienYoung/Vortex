@@ -27,6 +27,7 @@ namespace Vortex
 	public:
 		// Getters
         inline winrt::hstring GetDescription() const { return m_adapterDesc.Description; }
+		inline winrt::com_ptr<ID3D12Device14>  Get() const { return m_d3d12Device; }
 	private:
 		// Variables
 		DXGI_ADAPTER_DESC2 m_adapterDesc;

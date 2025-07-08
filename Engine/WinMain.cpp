@@ -1,6 +1,7 @@
 ﻿#include "pch.h"
 #include "MeshRenderPass.h"
 #include "SkyboxRenderPass.h"
+#include "RayTracingRenderPass.h"
 
 extern "C" { __declspec(dllexport) extern const UINT D3D12SDKVersion = 616; }
 extern "C" { __declspec(dllexport) extern const char* D3D12SDKPath = ".\\D3D12\\"; }

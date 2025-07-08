@@ -55,7 +55,7 @@ void Vortex::Renderer::Execute()
     // Passes frames.
     for (const std::unique_ptr<IRenderPass>& pass : m_passes)
     {
-        commandLists.push_back(pass->GetCommandList(*this));
+        commandLists.push_back(pass->GetCommandList(this));
     }
 
     // End frame.

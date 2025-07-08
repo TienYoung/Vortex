@@ -12,7 +12,7 @@
 #ifndef RAYTRACING_HLSL
 #define RAYTRACING_HLSL
 
-#include "Raytracing.h"
+// #include "Raytracing.h"
 
 RaytracingAccelerationStructure scene;
 RWTexture2D<float4> RenderTarget : register(u0);

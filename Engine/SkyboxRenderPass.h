@@ -31,23 +31,22 @@ namespace Vortex
             m_commandList = VX_DEVICE0->CreateGraphicsCommandList();
         }
 
-        inline ID3D12GraphicsCommandList10* GetCommandList(const Renderer& renderer) const override
+        inline ID3D12GraphicsCommandList10* GetCommandList(const Renderer* renderer) const override
         {
             winrt::check_hresult(m_commandAllocator->Reset());
-            winrt::check_hresult(m_commandList->Reset(m_commandAllocator.get(), nullptr));
+            winrt::check_hresult(m_commandList->Reset(m_commandAllocator.get(), m_skyboxPSO.get()));
 
-            m_commandList->RSSetViewports(1, renderer.GetViewport());
-            m_commandList->RSSetScissorRects(1, renderer.GetScissorRect());
+            m_commandList->RSSetViewports(1, renderer->GetViewport());
+            m_commandList->RSSetScissorRects(1, renderer->GetScissorRect());
 
-            D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = renderer.GetRenderTarget()->GetCPUDescriptorHandle();
+            D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = renderer->GetRenderTarget()->GetCPUDescriptorHandle();
             m_commandList->OMSetRenderTargets(1, &rtvHandle, FALSE, nullptr);
 
             std::vector<ID3D12DescriptorHeap*> heaps = VX_DEVICE0->GetHeaps();
             m_commandList->SetDescriptorHeaps(static_cast<uint32_t>(heaps.size()), heaps.data());
 
-            m_commandList->SetPipelineState(m_skyboxPSO.get());
             m_commandList->SetGraphicsRootSignature(m_rootSignature.get());
-            m_commandList->SetGraphicsRootDescriptorTable(0, renderer.GetGlobalParamsHandle());
+            m_commandList->SetGraphicsRootDescriptorTable(0, renderer->GetGlobalParamsHandle());
             m_commandList->DispatchMesh(1, 1, 1);
 
             winrt::check_hresult(m_commandList->Close());

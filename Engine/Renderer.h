@@ -15,7 +15,7 @@ namespace Vortex
 		public:
 			virtual ~IRenderPass() = default;
 
-            inline virtual ID3D12GraphicsCommandList10* GetCommandList(const Renderer& renderer) const = 0;
+            inline virtual ID3D12GraphicsCommandList10* GetCommandList(const Renderer* renderer) const = 0;
             //inline virtual ID3D12DescriptorHeap* GetDescriptorHeap() const = 0;
 		};
 
