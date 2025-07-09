@@ -14,8 +14,8 @@
 
 // #include "Raytracing.h"
 
-RaytracingAccelerationStructure scene;
-RWTexture2D<float4> RenderTarget : register(u0);
+RaytracingAccelerationStructure scene : register(t0, space0);
+RWTexture2D<float4> RenderTarget : register(u0, space0);
 
 struct RayPayload
 {

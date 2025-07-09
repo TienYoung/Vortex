@@ -72,7 +72,11 @@ namespace Vortex
 
 
 		winrt::com_ptr<ID3D12DescriptorHeap> CreateResourceHeap(uint32_t num) const;
-		
+
+		winrt::com_ptr<ID3D12DescriptorHeap> CreateResourceHeapOnCPU(uint32_t num) const;
+
+		winrt::com_ptr<ID3D12DescriptorHeap> CreateResourceHeapOnGPU(uint32_t num) const;
+
 		static void CreateResourceHeap(uint32_t deviceId, uint32_t num);
 
 		winrt::com_ptr<ID3D12Resource> CreateConstantResource(uint32_t sizeInBytes) const;

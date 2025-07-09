@@ -133,6 +133,7 @@
     </ClInclude>
     <ClInclude Include="RayTracingRenderPass.h" />
     <ClInclude Include="RenderTarget.h" />
+    <ClInclude Include="ShaderTable.h" />
     <ClInclude Include="SkyboxRenderPass.h" />
     <CopyFileToFolders Include="Assets\Shaders\ShaderUniforms.h">
       <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)Assets\Shaders</DestinationFolders>

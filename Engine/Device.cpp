@@ -315,6 +315,36 @@ winrt::com_ptr<ID3D12DescriptorHeap> Vortex::Device::CreateResourceHeap(uint32_t
 	return resourceHeap;
 }
 
+winrt::com_ptr<ID3D12DescriptorHeap> Vortex::Device::CreateResourceHeapOnCPU(uint32_t num) const
+{
+	D3D12_DESCRIPTOR_HEAP_DESC descriptorHeapDesc =
+	{
+		.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,
+		.NumDescriptors = num,
+		.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE,
+		.NodeMask = 0,
+	};
+
+	winrt::com_ptr<ID3D12DescriptorHeap> resourceHeap;
+	winrt::check_hresult(m_d3d12Device->CreateDescriptorHeap(&descriptorHeapDesc, IID_PPV_ARGS(&resourceHeap)));
+	return resourceHeap;
+}
+
+winrt::com_ptr<ID3D12DescriptorHeap> Vortex::Device::CreateResourceHeapOnGPU(uint32_t num) const
+{
+	D3D12_DESCRIPTOR_HEAP_DESC descriptorHeapDesc =
+	{
+		.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,
+		.NumDescriptors = num,
+		.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE,
+		.NodeMask = 0,
+	};
+
+	winrt::com_ptr<ID3D12DescriptorHeap> resourceHeap;
+	winrt::check_hresult(m_d3d12Device->CreateDescriptorHeap(&descriptorHeapDesc, IID_PPV_ARGS(&resourceHeap)));
+	return resourceHeap;
+}
+
 void Vortex::Device::CreateResourceHeap(uint32_t deviceId, uint32_t num)
 {
 	WINRT_ASSERT(deviceId == 0);
